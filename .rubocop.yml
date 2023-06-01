@@ -1,0 +1,12 @@
+AllCops: 
+  NewCops: 
+    disable
+
+Metrics/MethodLength:
+  Exclude:
+    - 'import.rb'
+
+Metrics/AbcSize:
+  Exclude:
+    - 'import.rb'
+  
