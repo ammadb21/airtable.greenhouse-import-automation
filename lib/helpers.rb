@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Record analiser
-class RecordAnaliser
+class RecordAnalyser
   def initialize(record)
     @record = record
   end
@@ -53,5 +53,10 @@ class RecordAnaliser
       '1387643' => 'English (ESL)'
     }
     jobs[job]
+  end
+
+  def country
+    country = @record['location']['address'].split(', ')[-1] unless @record['location'].nil?
+    country
   end
 end

@@ -1,0 +1,28 @@
+name: Airtable Greenhouse Import
+
+on:
+  #Run this script at 05:30 (7:30 CEST) on every Monday through Friday.
+  # schedule:
+  #  - cron: '30 5 * * 1-5'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+env:
+  AIRTABLE_HIRING_URL: /appP4rxoFKGrvzHyx/tblLg6JVivhDutwBP
+  AIRTABLE_API_TOKEN: ${{ secrets.AIRTABLE_API_TOKEN }}
+  OKTA_PEM: ${{ secrets.GREENHOUSE_API_TOKEN }}
+  
+jobs:
+  greenhouse-import:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Ruby and gems
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.2.2
+          bundler-cache: true
+      - name: Run Import script
+        run: bundle exec import.rb

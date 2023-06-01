@@ -1,0 +1,31 @@
+name: Lint & Unittest
+
+on:
+  # push:
+  #   branches: [ "main" ]
+  # pull_request:
+  #   branches: [ "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+env:
+  AIRTABLE_HIRING_URL: /appP4rxoFKGrvzHyx/tblLg6JVivhDutwBP
+  AIRTABLE_API_TOKEN: ${{ secrets.AIRTABLE_API_TOKEN }}
+  OKTA_PEM: ${{ secrets.GREENHOUSE_API_TOKEN }}
+  
+jobs:
+  Lint-Unittest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Ruby and gems
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.2.2
+          bundler-cache: true
+      - name: Run Lint & Unittest
+        run: |
+          bundle exec rubocop
+          bundle exec test/test_helper.rb
