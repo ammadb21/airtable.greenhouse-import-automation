@@ -20,22 +20,9 @@ class Airtable
     response
   end
 
-  def add_note(uid, note)
-    payload = JSON.dump({ 'fields': { 'Notes': note } })
-    response = self.class.patch("#{@airtable_url}/#{uid}", "body": payload)
-    abort("❌ Error in Airtable::add_note => #{response}") unless response.success?
-    response
-  end
-
   def create_record(payload)
     response = self.class.post(@airtable_url, "body": JSON.dump(payload))
     abort("❌ Error in Airtable::add_note => #{response}") unless response.success?
-    response
-  end
-
-  def del_record(uid)
-    response = self.class.delete("#{@airtable_url}/#{uid}")
-    abort("❌ Error in Airtable::del_record => #{response}") unless response.success?
     response
   end
 end
