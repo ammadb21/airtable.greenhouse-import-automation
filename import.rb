@@ -4,7 +4,14 @@
 
 require_relative 'lib/greenhouse'
 require_relative 'lib/airtable'
-require_relative 'lib/helpers'
+require_relative 'lib/analyser'
+require 'logger'
+
+logger = Logger.new($stdout)
+logger.formatter = proc do |severity, datetime, progname, msg|
+  date_format = datetime.strftime('%Y-%m-%d %H:%M:%S')
+  "[#{date_format}] #{severity}: (greenhouse-import) #{msg}#{progname}\n"
+end
 
 # DAF ID= 1384008
 # ITALS ID= 1479435
@@ -14,35 +21,36 @@ require_relative 'lib/helpers'
 
 job_ids = %w[1384008 1479435 1479432 1387643 1387638]
 
-def applications(job_id)
+def applications(job_id, logger)
   greenhouse = Greenhouse.new
   airtable = Airtable.new(ENV['AIRTABLE_HIRING_URL'])
   since_yesterday = (Time.now - 86_400).to_time.iso8601
 
   results = greenhouse.applications(job_id, since_yesterday)
   results.each do |result|
-    analise = RecordAnalyser.new(result)
+    analyse = RecordAnalyser.new(result)
     candidate = greenhouse.get_candidate(result['candidate_id'])
     payload = {
       "records": [
         {
           "fields": {
             "Full name": "#{candidate['first_name']} #{candidate['last_name']}",
-            "Language": analise.job(result['jobs'][0]['id'].to_s),
+            "Language": analyse.job,
             "Email": candidate['email_addresses'][0]['value'],
-            "Freelance": analise.freelancer?,
-            "Possible Start (greenhouse)": analise.start?,
-            "Availability 30h/month": analise.fulltime?,
-            "Experience as an online teacher": analise.experience?,
-            "Location / Country (greenhouse)": analise.country,
+            "Freelance": analyse.freelancer?,
+            "Possible Start (greenhouse)": analyse.start,
+            "Availability 30h/month": analyse.fulltime?,
+            "Experience as an online teacher": analyse.experience,
+            "Location / Country (greenhouse)": analyse.country,
             "Applied via": 'Greenhouse',
-            "Attachments": analise.attachments
+            "Attachments": analyse.attachments
           }
         }
       ]
     }
     airtable.create_record(payload)
+    logger.info "✅ Imported an applicant for #{analyse.job}!"
   end
 end
 
-job_ids.each { |job_id| applications(job_id) }
+job_ids.each { |job_id| applications(job_id, logger) }

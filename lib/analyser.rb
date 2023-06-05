@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Record analiser
+# Record Analyser
 class RecordAnalyser
   def initialize(record)
     @record = record
@@ -20,7 +20,7 @@ class RecordAnalyser
     is_freelance
   end
 
-  def experience?
+  def experience
     has_experience = nil
     @record['answers'].each do |answer|
       has_experience = answer['answer'] if answer['question'] == 'Online experience '
@@ -28,7 +28,7 @@ class RecordAnalyser
     has_experience
   end
 
-  def start?
+  def start
     can_start = nil
     @record['answers'].each do |answer|
       can_start = answer['answer'] if answer['question'] == 'What is your earliest start date?'
@@ -44,7 +44,7 @@ class RecordAnalyser
     fulltime
   end
 
-  def job(job)
+  def job
     jobs = {
       '1384008' => 'German (DAF)',
       '1479432' => 'French (FLE)',
@@ -52,7 +52,7 @@ class RecordAnalyser
       '1387638' => 'Spanish (ELE)',
       '1387643' => 'English (ESL)'
     }
-    jobs[job]
+    jobs[@record['jobs'][0]['id'].to_s]
   end
 
   def country
